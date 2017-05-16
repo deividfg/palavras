@@ -15,15 +15,15 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class Main {
 	public static int wpc = 0;
 	public static int processados = 0;
+	public static final String PATH = "/home/deivid/java/ProjetosGIT/palavras/";
 	
 	public static void main(String[] args) {
-		ConcurrentHashMap<String, ConcurrentHashMap<String, Integer>> hashPalavras = new ConcurrentHashMap<>();
+		ConcurrentHashMap<String, ConcurrentHashMap<String, String>> hashPalavras = new ConcurrentHashMap<>();
 		long t1 = 0;
 		long t2 = 0;
 		long t3 = 0;
 		
-		File folder = new File("/home/deividfg/java/projetos/palavras/");
-		///home/deividfg/Downloads/livros/
+		File folder = new File(PATH);
 		File[] listOfFiles = folder.listFiles();
 		
 		final ConcurrentLinkedQueue<File> listfiles = new ConcurrentLinkedQueue<>();
@@ -31,7 +31,9 @@ public class Main {
 		t1 = System.nanoTime();
 		
 		for (int j = 0; j < listOfFiles.length; j++) {
-			listfiles.add(listOfFiles[j]);
+		    if (listOfFiles[j].getName().endsWith("txt")){
+		        listfiles.add(listOfFiles[j]);
+		    }
 		}
 		
 		final int tamanhototal = listfiles.size();
@@ -47,6 +49,7 @@ public class Main {
 					
 					while(listfiles.size()>0) {
 						String filename = listfiles.poll().getPath();
+						
 						t4 = System.nanoTime();
 						
 						processaArquivo(hashPalavras, filename);
@@ -67,7 +70,6 @@ public class Main {
 			try {
 				threads[i].join();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -78,14 +80,14 @@ public class Main {
 
 		for (Iterator iterator = hashPalavras.keySet().iterator(); iterator.hasNext();) {
 			String key = (String) iterator.next();
-			// System.out.println(""+key+" "+hashPalavras.get(key));
+			System.out.println(""+key+" "+hashPalavras.get(key));
 			listaPalavras.add(new ChaveValor(key, hashPalavras.get(key)));
 		}
 
 		Collections.sort(listaPalavras, new Comparator<ChaveValor>() {
 			@Override
 			public int compare(ChaveValor o1, ChaveValor o2) {
-				return o1.valor > o2.valor ? -1 : (o1.valor < o2.valor ? 1 : 0);
+				return o1.paginas.compareTo(o2.paginas);
 			}
 		});
 
@@ -93,12 +95,11 @@ public class Main {
 			FileWriter fr = new FileWriter("OUTPUT.csv");
 			for (Iterator iterator = listaPalavras.iterator(); iterator.hasNext();) {
 				ChaveValor chaveValor = (ChaveValor) iterator.next();
-				// System.out.println(chaveValor.key+" "+chaveValor.valor);
-				fr.write(chaveValor.key + ";" + chaveValor.valor +";"+chaveValor.getStringOut()+"\n");
+				System.out.println(chaveValor.key+" "+chaveValor.paginas);
+				fr.write(chaveValor.key + ";" + chaveValor.paginas +";"+chaveValor.getStringOut()+"\n");
 			}
 			fr.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -109,15 +110,44 @@ public class Main {
 		System.out.println("Time Sort " + ((t3 - t2) / 1000000.0 / 1000.0));
 	}
 
-	private static void processaArquivo(ConcurrentHashMap<String, ConcurrentHashMap<String, Integer>> hashPalavras, String filename) {
+	private static void processaArquivo(ConcurrentHashMap<String, ConcurrentHashMap<String, String>> hashPalavras, String filename) {
 		try {
 			FileReader fr = new FileReader(filename);
 			BufferedReader bfr = new BufferedReader(fr);
 
 			String line = "";
+			
+			Object[] lines = bfr.lines().toArray();
+			
+			for (int x = 0; x < lines.length; x++) {
+			    line = (String)lines[x];
+			    line = Normalizer.normalize(line, Normalizer.Form.NFD);
+                line = line.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+                line = line.replaceAll("[^a-zA-Z ]", " ");
+                line = line.toLowerCase();
+                String str[] = line.split(" ");
+                for (int i = 0; i < str.length; i++) {
+                    if (str[i].length() > 0 && str[i].length() < 30) {
+                        if (hashPalavras.containsKey(str[i])) {
+                            ConcurrentHashMap<String, String> hlivros = hashPalavras.get(str[i]);
+                            if(hlivros.containsKey(filename)){
+                                String valor = hlivros.get(filename);
+                                valor = valor + "," + x;
+                                hlivros.put(filename, valor);
+                            }else{
+                                hlivros.put(filename, x+"");
+                            }
+                        } else {
+                            ConcurrentHashMap<String, String> hlivros = new ConcurrentHashMap<>();
+                            hlivros.put(filename, x+"");
+                            hashPalavras.put(str[i], hlivros);
+                        }
+                        wpc++;
+                    }
+                }
+            }
 
-
-			while ((line = bfr.readLine()) != null) {
+			/*while ((line = bfr.readLine()) != null) {
 				line = Normalizer.normalize(line, Normalizer.Form.NFD);
 				line = line.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
 				line = line.replaceAll("[^a-zA-Z ]", " ");
@@ -142,13 +172,11 @@ public class Main {
 						wpc++;
 					}
 				}
-			}
+			}*/
 			bfr.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -156,22 +184,22 @@ public class Main {
 
 class ChaveValor {
 	String key;
-	int valor;
-	ConcurrentHashMap<String, Integer> hash = null;
+	String paginas;
+	ConcurrentHashMap<String, String> hash = null;
 
-	public ChaveValor(String key, ConcurrentHashMap<String, Integer> hash) {
+	public ChaveValor(String key, ConcurrentHashMap<String, String> hash) {
 		super();
 		this.key = key;
 		this.hash = hash;
 		
 		for (Iterator iterator = hash.values().iterator(); iterator.hasNext();) {
-			int v = (int) iterator.next();
-			valor+=v;
+			String v = (String) iterator.next();
+			paginas = paginas + "," + v;
 		}	
 	}
-	public ChaveValor(String key, int valor){
+	public ChaveValor(String key, String valor){
 		this.key = key;
-		this.valor = valor;
+		this.paginas = valor;
 		hash = null;
 	}
 	
@@ -187,13 +215,13 @@ class ChaveValor {
 		Collections.sort(listaLivros, new Comparator<ChaveValor>() {
 			@Override
 			public int compare(ChaveValor o1, ChaveValor o2) {
-				return o1.valor > o2.valor ? -1 : (o1.valor < o2.valor ? 1 : 0);
+				return o1.paginas.compareTo(o2.paginas);
 			}
 		});
 		
 		for (Iterator iterator = listaLivros.iterator(); iterator.hasNext();) {
 			ChaveValor chaveValor = (ChaveValor) iterator.next();
-			s+=""+chaveValor.key.replace(".\\livros\\","")+";"+chaveValor.valor+";";
+			s+=""+chaveValor.key.replace("/home/deivid/java/ProjetosGIT/palavras/","")+";"+chaveValor.paginas+";";
 		}
 		
 		return s;
