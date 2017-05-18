@@ -32,6 +32,7 @@ public class MainIndexa {
 		
 		long t4 = 0;
 		long t5 = 0;
+		int quantidadeArquivos = arquivos.size();
 		
 		while(!arquivos.isEmpty()) {
 			String nomeArquivo = arquivos.poll().getPath();
@@ -42,7 +43,7 @@ public class MainIndexa {
 			processaArquivo(palavras, nomeArquivo);
 			
 			t5 = System.nanoTime();
-			System.out.println("" + (processados+1) + "/" + arquivos.size() + " Tempo: " + ((t5 - t4) / 1000000.0 / 1000.0)+ " Arquivo: " + nomeArquivo);
+            System.out.println("" + (processados+1) + "/" + quantidadeArquivos + " Tempo: " + ((t5 - t4) / 1000000.0 / 1000.0)+ " Arquivo: " + nomeArquivo);
 			processados++;
 		}
 					
@@ -53,8 +54,8 @@ public class MainIndexa {
 		//Exemplo: "resume;mobydick,2025,9589;wells-war-189,3838,5586,6040;stoker-dracula-168,1268,9797"
 		escreveArquivoIndexacao(palavras);
 		
-		System.out.println("NPALAVRAS " + palavras.size());
-		System.out.println("Time Processing " + ((t2 - t1) / 1000000.0 / 1000.0));
+		System.out.println("Quantidade de palavras: " + palavras.size());
+		System.out.println("Tempo de processamento (segundos): " + ((t2 - t1) / 1000000.0 / 1000.0));
 	}
 
     private static void escreveArquivoIndexacao(ConcurrentHashMap<String, ConcurrentHashMap<String, String>> palavras) {
