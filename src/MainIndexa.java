@@ -5,13 +5,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.Normalizer;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MainIndexa {
 	public static void main(String[] args) {
-		ConcurrentHashMap<String, ConcurrentHashMap<String, String>> palavras = new ConcurrentHashMap<>();
+		HashMap<String, HashMap<String, String>> palavras = new HashMap<>();
 		long t1 = 0;
 		long t2 = 0;
 		int processados = 0;
@@ -23,7 +23,7 @@ public class MainIndexa {
 		
 		t1 = System.nanoTime();
 		
-		//Adicionando somente arquivos com a extensão definida.
+		//Adicionando somente arquivos com a extensï¿½o definida.
 		for (int j = 0; j < arquivosTemp.length; j++) {
 		    if (arquivosTemp[j].getName().endsWith(Constantes.EXTENSAO)){
 		        arquivos.add(arquivosTemp[j]);
@@ -49,7 +49,7 @@ public class MainIndexa {
 					
 		t2 = System.nanoTime();
 		
-		//Escreve dados no arquivo de indexação.
+		//Escreve dados no arquivo de indexaï¿½ï¿½o.
 		//Formato: "palavra;livro,pagina,pagina,...;livro,pagina,pagina...;...
 		//Exemplo: "resume;mobydick,2025,9589;wells-war-189,3838,5586,6040;stoker-dracula-168,1268,9797"
 		escreveArquivoIndexacao(palavras);
@@ -58,7 +58,7 @@ public class MainIndexa {
 		System.out.println("Tempo de processamento (segundos): " + ((t2 - t1) / 1000000.0 / 1000.0));
 	}
 
-    private static void escreveArquivoIndexacao(ConcurrentHashMap<String, ConcurrentHashMap<String, String>> palavras) {
+    private static void escreveArquivoIndexacao(HashMap<String, HashMap<String, String>> palavras) {
         try {
 			FileWriter fr = new FileWriter(Constantes.INDEXADO);
 			for (Iterator iteratorPalavras = palavras.keySet().iterator(); iteratorPalavras.hasNext();) {
@@ -78,14 +78,14 @@ public class MainIndexa {
 		}
     }
 
-	private static void processaArquivo(ConcurrentHashMap<String, ConcurrentHashMap<String, String>> palavras, String nomearquivo) {
+	private static void processaArquivo(HashMap<String, HashMap<String, String>> palavras, String nomearquivo) {
 		try {
 			FileReader arquivo = new FileReader(nomearquivo);
 			BufferedReader reader = new BufferedReader(arquivo);
 
 			Object[] linhas = reader.lines().toArray();
 			
-			//Diminui o nome do arquivo pra ocupar menos espaço no arquivo de indexação
+			//Diminui o nome do arquivo pra ocupar menos espaï¿½o no arquivo de indexaï¿½ï¿½o
 			nomearquivo = nomearquivo.replace(Constantes.CAMINHO, "").replaceAll(Constantes.EXTENSAO, "");
 			
 			for (int indiceLinha = 0; indiceLinha < linhas.length; indiceLinha++) {
@@ -95,14 +95,14 @@ public class MainIndexa {
                 for (int indicePalavra = 0; indicePalavra < palavra.length; indicePalavra++) {
                     if (palavra[indicePalavra].length() >= Constantes.MIN_PALAVRA && palavra[indicePalavra].length() < 30) {
                         if (palavras.containsKey(palavra[indicePalavra])) {
-                            ConcurrentHashMap<String, String> livros = palavras.get(palavra[indicePalavra]);
+                            HashMap<String, String> livros = palavras.get(palavra[indicePalavra]);
                             if(livros.containsKey(nomearquivo)){
                                 livros.put(nomearquivo, livros.get(nomearquivo) + "," + indiceLinha);
                             }else{
                                 livros.put(nomearquivo, indiceLinha+"");
                             }
                         } else {
-                            ConcurrentHashMap<String, String> livros = new ConcurrentHashMap<>();
+                            HashMap<String, String> livros = new HashMap<>();
                             livros.put(nomearquivo, indiceLinha+"");
                             palavras.put(palavra[indicePalavra], livros);
                         }

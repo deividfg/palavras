@@ -10,11 +10,11 @@ public class MainConsulta {
         
         long t1 = 0;
         
-        //Lê a palavra
+        //Lï¿½ a palavra
         String palavra = null;
         
         while (palavra == null || palavra.length() < Constantes.MIN_PALAVRA){
-            palavra = JOptionPane.showInputDialog("O que você procura?");
+            palavra = JOptionPane.showInputDialog("O que vocï¿½ procura?");
             if (palavra.length() < Constantes.MIN_PALAVRA){
                 JOptionPane.showMessageDialog(null, "A palavra deve conter ao menos " + Constantes.MIN_PALAVRA + " caracteres!");
             }
@@ -24,8 +24,8 @@ public class MainConsulta {
         
         String busca = null;
         try {
-            //Lê o arquivo indexado.
-            FileReader indexado = new FileReader(Constantes.CAMINHO + Constantes.INDEXADO);
+            //Lï¿½ o arquivo indexado.
+            FileReader indexado = new FileReader(Constantes.INDEXADO);
             BufferedReader reader = new BufferedReader(indexado);
             Object[] linhas = reader.lines().toArray();
             
@@ -43,7 +43,7 @@ public class MainConsulta {
         
         //Mostra mensagem
         if (busca == null){
-            JOptionPane.showMessageDialog(null, "Texto não encontrado!");
+            JOptionPane.showMessageDialog(null, "Texto nï¿½o encontrado!");
         } else {
             //Captura linhas dos arquivos.
             String[] livros = busca.split(";");
@@ -51,7 +51,7 @@ public class MainConsulta {
             StringBuilder mensagem = new StringBuilder();
             mensagem.append("<html>");
             
-            //Começa em 1 pois o primeiro campo é a palavra.
+            //Comeï¿½a em 1 pois o primeiro campo ï¿½ a palavra.
             for (int indiceLivros = 1; indiceLivros < livros.length; indiceLivros++) {
                 
                 String[] linhas = livros[indiceLivros].split(",");
@@ -61,7 +61,7 @@ public class MainConsulta {
                 BufferedReader reader = new BufferedReader(arquivo);
                 Object[] linhasDoArquivo = reader.lines().toArray();
                 
-                //Começa em 1 pois o primeiro campo é o nome do livro.
+                //Comeï¿½a em 1 pois o primeiro campo ï¿½ o nome do livro.
                 for (int indiceLinhas = 1; indiceLinhas < linhas.length; indiceLinhas++) {
                     String palavraSublinhada = (String)linhasDoArquivo[Integer.parseInt(linhas[indiceLinhas])];
                     
