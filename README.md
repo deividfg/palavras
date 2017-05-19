@@ -9,3 +9,4 @@ TODO
 - a indexação demorou 35 minutos na minha maquina, e gerou um arquivo de 1.2 gb
 - teve que colocar 8 gb de memória pra executar a indexação
 - acredito que na indexação não tenha o que melhorar, talvez threads, a exibição que esta complicada
+- talvez dividir os arquivos indexados em tamanhos não muito grandes
