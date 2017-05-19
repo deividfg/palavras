@@ -23,7 +23,7 @@ public class MainIndexa {
 		
 		t1 = System.nanoTime();
 		
-		//Adicionando somente arquivos com a extens�o definida.
+		//Adicionando somente arquivos com a extensão definida.
 		for (int j = 0; j < arquivosTemp.length; j++) {
 		    if (arquivosTemp[j].getName().endsWith(Constantes.EXTENSAO)){
 		        arquivos.add(arquivosTemp[j]);
@@ -49,7 +49,7 @@ public class MainIndexa {
 					
 		t2 = System.nanoTime();
 		
-		//Escreve dados no arquivo de indexa��o.
+		//Escreve dados no arquivo de indexação.
 		//Formato: "palavra;livro,pagina,pagina,...;livro,pagina,pagina...;...
 		//Exemplo: "resume;mobydick,2025,9589;wells-war-189,3838,5586,6040;stoker-dracula-168,1268,9797"
 		escreveArquivoIndexacao(palavras);
@@ -85,11 +85,11 @@ public class MainIndexa {
 
 			Object[] linhas = reader.lines().toArray();
 			
-			//Diminui o nome do arquivo pra ocupar menos espa�o no arquivo de indexa��o
+			//Diminui o nome do arquivo pra ocupar menos espaço no arquivo de indexação
 			nomearquivo = nomearquivo.replace(Constantes.CAMINHO, "").replaceAll(Constantes.EXTENSAO, "");
 			
 			for (int indiceLinha = 0; indiceLinha < linhas.length; indiceLinha++) {
-			    //Remove caracteres especiais, numeros.
+			    //Remove caracteres especiais, números.
 			    String linha = normalizaLinha(linhas, indiceLinha);
                 String palavra[] = linha.split(" ");
                 for (int indicePalavra = 0; indicePalavra < palavra.length; indicePalavra++) {
